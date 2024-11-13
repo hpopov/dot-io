@@ -9,7 +9,7 @@ export function ChordManagerHeader(): ReactElement {
         </h1>
       </div>
       <h2 className="lg:w-1/2 w-full leading-relaxed text-gray-300 font-semibold font-mono">
-        NOTE: This site is deprecated. You should use the new <a className="underline" href="https://manager.charachorder.com/config/layout/">Device Manager.</a>
+        NOTE: This site is deprecated. You should use the new <a className="underline" href="https://charachorder.io">Device Manager.</a>
       </h2>
     </div>
   );

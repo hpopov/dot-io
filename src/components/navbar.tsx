@@ -181,7 +181,7 @@ const Navbar = (): ReactElement => {
           <NavMenuLink aria-current="page">
             <NavLinksImage open={false} src={Crown_Icon} alt="" />
           </NavMenuLink>
-          <NavBtnLink target="_blank" href="https://manager.charachorder.com">
+          <NavBtnLink target="_blank" href="https://charachorder.io">
             <div className="text-white">Manager</div>
           </NavBtnLink>
           <button
