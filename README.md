@@ -1,3 +1,5 @@
+# No longer maintained
+
 # Introduction
 
 [Dot I/O](https://www.iq-eq.io/#/) is a free, open source, web based training tool designed to forever change the way we learn to type.
