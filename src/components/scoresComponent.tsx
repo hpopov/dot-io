@@ -2,11 +2,20 @@ import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 import { useStoreState } from 'easy-peasy';
 import { wpmMethodCalculatorForStoredChords } from '../../src/helpers/aggregation';
+import { CompleteStoreModel } from '@/models/storeModel';
+
+const HideWhenScreenGetSmallEnough = styled.div`
+  @media screen and (max-width: 1000px) {
+    display: none;
+  }
+`;
 
 export function ScoresComponent(): ReactElement {
-  const maxWPM = useStoreState((store) => store.fastestRecordedWordsPerMinute);
+  const maxWPM = useStoreState<CompleteStoreModel>(
+    (store) => store.fastestRecordedWordsPerMinute,
+  );
 
-  const storedChordsFromDevice = useStoreState(
+  const storedChordsFromDevice = useStoreState<CompleteStoreModel>(
     (store) => store.storedChordsFromDevice,
   );
 
@@ -20,12 +29,6 @@ export function ScoresComponent(): ReactElement {
         : wpmMethodCalculatorForStoredChords(d?.chordsMastered, d.id.length);
   });
 
-  const HideWhenScreenGetSmallEnough = styled.div`
-    @media screen and (max-width: 1000px) {
-      display: none;
-    }
-  `;
-
   return (
     <React.Fragment>
       <HideWhenScreenGetSmallEnough>
@@ -34,31 +37,33 @@ export function ScoresComponent(): ReactElement {
             //<div className="text-center">Hunt &#38; Pecker</div>
           }
           <table>
-            <tr>
-              <td>-</td>
-              <td>tWPM</td>
-              <td />
-              <td>-</td>
-              <td>sWPM</td>
-            </tr>
-            <tr>
-              <td>{(sumOfChordsMastered / 100)?.toFixed(2)}</td>
-              <td>ChM</td>
-              <td />
-              <td>-</td>
-              <td>StM</td>
-            </tr>
-            <tr>
-              <td>
-                {parseInt(
-                  Math.max.apply(Math, Object.values(maxWPM))?.toFixed(),
-                )}
-              </td>
-              <td>CPM</td>
-              <td />
-              <td>-</td>
-              <td>CM</td>
-            </tr>
+            <tbody>
+              <tr>
+                <td>-</td>
+                <td>tWPM</td>
+                <td />
+                <td>-</td>
+                <td>sWPM</td>
+              </tr>
+              <tr>
+                <td>{(sumOfChordsMastered / 100)?.toFixed(2)}</td>
+                <td>ChM</td>
+                <td />
+                <td>-</td>
+                <td>StM</td>
+              </tr>
+              <tr>
+                <td>
+                  {parseInt(
+                    Math.max.apply(Math, Object.values(maxWPM))?.toFixed(),
+                  )}
+                </td>
+                <td>CPM</td>
+                <td />
+                <td>-</td>
+                <td>CM</td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </HideWhenScreenGetSmallEnough>
