@@ -246,8 +246,6 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['ALPHABET']);
-
-    // Set to AUTO mode to enable auto-updates of training settings
     actions().setTrainingSettings({
       ...state().trainingSettings,
       autoOrCustom: 'AUTO',
@@ -270,8 +268,6 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['ALPHABET']);
-
-    // Set to AUTO mode to enable auto-updates of training settings
     actions().setTrainingSettings({
       ...state().trainingSettings,
       autoOrCustom: 'AUTO',
@@ -305,6 +301,8 @@ describe('<App>', () => {
       autoOrCustom: 'AUTO',
       recursionRate: 0, // Reset to 0 when switching to AUTO mode
     });
+    // Set a known sequence of unique chords to avoid flakiness from duplicates
+    actions().UNSAFE_setTrainingText([['a', 'b', 'c', 'd']]);
     expect(state().trainingSettings.recursionRate).to.equal(0);
 
     timer?.tick(100);
@@ -333,6 +331,8 @@ describe('<App>', () => {
       ...state().trainingSettings,
       autoOrCustom: 'AUTO',
     });
+    // Set a known sequence of unique words to avoid flakiness from duplicates
+    actions().UNSAFE_setTrainingText([['word1', 'word2', 'word3']]);
     testRecursionRatePercentageInMode(actions, state);
   });
 
@@ -346,6 +346,8 @@ describe('<App>', () => {
       ...state().trainingSettings,
       autoOrCustom: 'AUTO',
     });
+    // Set a known sequence of unique chords to avoid flakiness from duplicates
+    actions().UNSAFE_setTrainingText([['chord1', 'chord2', 'chord3']]);
     testRecursionRatePercentageInMode(actions, state);
   });
 
@@ -359,10 +361,12 @@ describe('<App>', () => {
       ...state().trainingSettings,
       autoOrCustom: 'AUTO',
     });
+    // Set a known sequence of unique trigrams to avoid flakiness from duplicates
+    actions().UNSAFE_setTrainingText([['abc', 'def', 'ghi']]);
     testRecursionRatePercentageInMode(actions, state);
   });
 
-  it('only updates settings if set to "auto"', () => {
+  it('should NOT update settings if set to "custom"', () => {
     const store = createStore<CompleteStoreModel>(defaultStoreState);
     const actions = store.getActions;
     const state = store.getState;
@@ -461,6 +465,8 @@ function trainAlphabet(
   timer: IMockPerformance | null,
 ) {
   actions().beginTrainingMode(['ALPHABET']);
+  // Set deterministic training text to avoid flakiness
+  actions().UNSAFE_setTrainingText([ALPHABET_CHORDS]);
 
   const numberOfKeysBeforeTraining = parseFloat(
     getCumulativeValueByPropertyName(
