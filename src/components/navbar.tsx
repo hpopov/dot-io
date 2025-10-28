@@ -3,9 +3,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import DumbellImage from '../assets/Dumbell.png';
 import BooksImage from '../assets/Books.png';
-import profileImage from '../assets/profile.png';
 import { ROUTER_PATHS } from './router';
-import { FaBars } from 'react-icons/fa';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import CM_Icon from '../assets/CM_icon.png';
 import CPM_Icon from '../assets/CPM_icon.png';
@@ -19,35 +17,38 @@ import InfoIcon from '../../src/pages/test/components/InfoIcon';
 import type { TrainingLevels } from '../../src/models/trainingLevels';
 import Circle from './CircleHighlight';
 import HamburgerMenu from './hamburgerMenu';
+import { CompleteStoreModel } from '@/models/storeModel';
 
 const Navbar = (): ReactElement => {
   const history = useHistory();
 
-  const beginTraining = useStoreActions(
-    (store: any) => store.beginTrainingMode,
+  const beginTraining = useStoreActions<CompleteStoreModel>(
+    (store) => store.beginTrainingMode,
   );
-  const setIsDisplayingIntroductionModal = useStoreActions(
-    (store: any) => store.setIsDisplayingIntroductionModal,
+  const setIsDisplayingIntroductionModal = useStoreActions<CompleteStoreModel>(
+    (store) => store.setIsDisplayingIntroductionModal,
   );
-  const setTrainingLevel = useStoreActions(
-    (store: any) => store.setTrainingLevel,
+  const setTrainingLevel = useStoreActions<CompleteStoreModel>(
+    (store) => store.setTrainingLevel,
   );
-  const trainingLevel = useStoreState((store: any) => store.trainingLevel);
-  const setModuleNumber = useStoreActions(
-    (store: any) => store.setModuleNumber,
+  const trainingLevel = useStoreState<CompleteStoreModel>(
+    (store) => store.trainingLevel,
   );
-  const setPasswordModuleModalToggle = useStoreActions(
-    (store: any) => store.setPasswordModuleModalToggle,
+  const setModuleNumber = useStoreActions<CompleteStoreModel>(
+    (store) => store.setModuleNumber,
   );
-  const passwordModuleModalToggle = useStoreActions(
-    (store: any) => store.passwordModuleModalToggle,
+  const setPasswordModuleModalToggle = useStoreActions<CompleteStoreModel>(
+    (store) => store.setPasswordModuleModalToggle,
   );
-  const chmTierPasswordBypass = useStoreState(
-    (store: any) => store.chmTierPasswordBypass,
+  const passwordModuleModalToggle = useStoreActions<CompleteStoreModel>(
+    (store) => store.passwordModuleModalToggle,
+  );
+  const chmTierPasswordBypass = useStoreState<CompleteStoreModel>(
+    (store) => store.chmTierPasswordBypass,
   );
 
   /* eslint-disable */
-  const maxWPM = useStoreState(
+  const maxWPM = useStoreState<CompleteStoreModel>(
     (store) =>
       parseInt(
         Math.max
@@ -317,7 +318,7 @@ const NavLinksImageTransparent = styled.img`
   }
 `;
 
-const NavBtn = styled.button`
+const NavBtn = styled.div`
   display: flex;
   align-items: center;
   @media screen and (max-width: 1000px) {
