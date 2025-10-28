@@ -219,7 +219,7 @@ export function TextPrompt(): ReactElement {
           tempBufferInTheFront += '.';
         }
         tempArray.push(
-          <React.Fragment>
+          <React.Fragment key="buffer-fragments">
             <span className="text-white m-0 flex">{tempBufferInTheFront}</span>
             <div className="text-gray-500">{arr}</div>
             <span className="text-white m-0 flex">{tempBufferInTheBack}</span>
@@ -229,7 +229,11 @@ export function TextPrompt(): ReactElement {
         for (let f = 1; f < targetTextLineOne.length; f++) {
           tempValue = targetTextLineOne[f] + ' ';
 
-          tempArray.push(<div className="text-white">{tempValue}</div>);
+          tempArray.push(
+            <div key={`temp-${f}`} className="text-white">
+              {tempValue}
+            </div>,
+          );
         }
 
         displayArray = tempArray;
@@ -262,7 +266,11 @@ export function TextPrompt(): ReactElement {
               placeholder += '*';
             }
 
-            displayArray.push(<div className="text-white">{placeholder}</div>);
+            displayArray.push(
+              <div key={`placeholder-${i}`} className="text-white">
+                {placeholder}
+              </div>,
+            );
 
             spacesBetweenWords = 0;
           } else {
@@ -274,7 +282,7 @@ export function TextPrompt(): ReactElement {
                 periodsIfLengthOfTypedErrorIsLongerThanChordsLength += '.';
               }
               displayArray.push(
-                <div className="text-gray">
+                <div key={`error-${i}`} className="text-gray">
                   {periodsIfLengthOfTypedErrorIsLongerThanChordsLength}
                 </div>,
               );
@@ -299,25 +307,33 @@ export function TextPrompt(): ReactElement {
                   tempCompareValue[t] ==
                   (tempTargetWord[t] == undefined ? '' : tempTargetWord[t])
                     ? thisNewArray.push(
-                        <span className="text-white m-0 flex">
+                        <span
+                          key={`correct-${i}-${t}`}
+                          className="text-white m-0 flex"
+                        >
                           {tempTargetWord[t]}
                         </span>,
                       )
                     : thisNewArray.push(
-                        <span className=" m-0 flex">
+                        <span key={`incorrect-${i}-${t}`} className=" m-0 flex">
                           {tempCompareValue[t]}
                         </span>,
                       );
                 } else {
                   thisNewArray.push(
-                    <span className="text-white m-0 flex">
+                    <span
+                      key={`undefined-${i}-${t}`}
+                      className="text-white m-0 flex"
+                    >
                       {tempTargetWord[t]}
                     </span>,
                   );
                 }
               }
               displayArray.push(
-                <span className="m-0 flex">{thisNewArray}</span>,
+                <span key={`word-${i}`} className="m-0 flex">
+                  {thisNewArray}
+                </span>,
               );
             }
           }
@@ -335,7 +351,11 @@ export function TextPrompt(): ReactElement {
             }
             sd += ' ';
             d == y ? sd == sd.slice(1) : sd;
-            displayArray.push(<div className="text-white">{sd}</div>);
+            displayArray.push(
+              <div key={`remaining-${d}`} className="text-white">
+                {sd}
+              </div>,
+            );
           }
 
           //This piece of code handles the experience while your typing in real time
@@ -354,7 +374,10 @@ export function TextPrompt(): ReactElement {
               frontBufferValues += '.';
             }
             displayArray[indexOfTargetChord] = (
-              <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <div
+                key={`typing-${indexOfTargetChord}`}
+                style={{ display: 'flex', flexDirection: 'row' }}
+              >
                 {frontBufferValues.indexOf('.') != -1 ? (
                   <span className="text-white m-0 flex">
                     {frontBufferValues}
@@ -649,6 +672,7 @@ export function TextPrompt(): ReactElement {
                 /* eslint-disable */
                 return (
                   <CharacterEntryChord
+                    key={`entry-${i}`}
                     word={chord}
                     index={targetCharacterIndex}
                   />
