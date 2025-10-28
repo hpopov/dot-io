@@ -557,7 +557,10 @@ function checkIfShouldProceedToNextTargetChord(
   storeState: TrainingStoreStateModel,
   actions: Actions<TrainingStoreModel>,
 ) {
-  const wordValue = document.getElementById('chordsInput')?.value;
+  const wordValueFromDom = document.getElementById(
+    'chordsInput',
+  ) as HTMLInputElement | null;
+  const wordValue = wordValueFromDom?.value ?? storeState.typedTrainingText;
   const wordToCompare = isInAlphabetMode
     ? storeState.targetWord
     : storeState.targetWord + ' ';
