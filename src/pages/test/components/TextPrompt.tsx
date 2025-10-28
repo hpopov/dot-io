@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import type { TrainingScenario } from '../../../../src/models/trainingScenario';
 import { useStoreActions, useStoreState } from '../../../store/store';
@@ -27,82 +27,76 @@ export function TextBlurredScreen() {
 
 export function TextPrompt(): ReactElement {
   const indexOfTargetChord = useStoreState(
-    (store: any) => store.currentSubindexInTrainingText,
+    (store) => store.currentSubindexInTrainingText,
   );
 
   const setTextPromptUnFocused = useStoreActions(
     (store) => store.setTextPromptUnFocused,
   );
   const previousTargetTextLineOne = useStoreState(
-    (store: any) => store.previousTargetTextLineOne,
+    (store) => store.previousTargetTextLineOne,
   );
   const firstLineOfTargetText = useStoreState(
-    (store: any) => store.targetTextLineOne,
+    (store) => store.targetTextLineOne,
   );
   const secondLineOfTargetText = useStoreState(
-    (store: any) => store.targetTextLineTwo,
+    (store) => store.targetTextLineTwo,
   );
   const thirdLineOfTargetText = useStoreState(
-    (store: any) => store.targetTextLineThree,
+    (store) => store.targetTextLineThree,
   );
   const fourthLineOfTargetText = useStoreState(
-    (store: any) => store.targetTextLineFour,
+    (store) => store.targetTextLineFour,
   );
   const isError = useStoreState(
-    (store: any) => store.errorOccurredWhileAttemptingToTypeTargetChord,
+    (store) => store.errorOccurredWhileAttemptingToTypeTargetChord,
   );
 
   const textPromptUnFocused = useStoreState(
     (store) => store.textPromptUnFocused,
   );
   const targetCharacterIndex = useStoreState(
-    (store: any) => store.targetCharacterIndex,
+    (store) => store.targetCharacterIndex,
   );
-  const characterEntryMode = useStoreState(
-    (store: any) => store.characterEntryMode,
-  );
+  const characterEntryMode = useStoreState((store) => store.characterEntryMode);
   const storeAllTypedText = useStoreActions(
-    (store: any) => store.setAllTypedCharactersStore,
+    (store) => store.setAllTypedCharactersStore,
   );
-  const allTypedText = useStoreState(
-    (store: any) => store.allTypedCharactersStore,
-  );
+  const allTypedText = useStoreState((store) => store.allTypedCharactersStore);
   const trainingTestCounter = useStoreState(
-    (store: any) => store.trainingTestCounter,
+    (store) => store.trainingTestCounter,
   );
   const setTrainingTestCounter = useStoreActions(
-    (store: any) => store.setTrainingTestCounter,
+    (store) => store.setTrainingTestCounter,
   );
   const currentTrainingScenario = useStoreState(
-    (store: any) => store.currentTrainingScenario,
+    (store) => store.currentTrainingScenario,
   );
   const setTypedTrainingText = useStoreActions(
-    (store: any) => store.setTypedTrainingText,
+    (store) => store.setTypedTrainingText,
   );
-  const storedTestTextData = useStoreState(
-    (store: any) => store.storedTestTextData,
-  );
-  const setS = useStoreState((store: any) => store.compareText);
+  const storedTestTextData = useStoreState((store) => store.storedTestTextData);
+  const setS = useStoreState((store) => store.compareText);
   const setCurrentSubindexInTrainingText = useStoreActions(
-    (store: any) => store.setCurrentSubindexInTrainingText,
+    (store) => store.setCurrentSubindexInTrainingText,
   );
   const setEditingPreviousWord = useStoreActions(
     (store) => store.setUserIsEditingPreviousWord,
   );
   const isEditingPreviousWord = useStoreState(
-    (store: any) => store.userIsEditingPreviousWord,
+    (store) => store.userIsEditingPreviousWord,
   );
   const setChordingEnabled = useStoreActions(
-    (store: any) => store.setIsUsingChordingEnabledDevice,
+    (store) => store.setIsUsingChordingEnabledDevice,
   );
   const setNumberOfWordsChorded = useStoreActions(
-    (store: any) => store.setNumberOfWordsChorded,
+    (store) => store.setNumberOfWordsChorded,
   );
   const numberOfWordsChorded = useStoreState(
-    (store: any) => store.numberOfWordsChorded,
+    (store) => store.numberOfWordsChorded,
   );
   const isChordingEnabled = useStoreState(
-    (store: any) => store.isUsingChordingEnabledDevice,
+    (store) => store.isUsingChordingEnabledDevice,
   );
 
   const [bestKeyTime, setBestKeyTime] = useState([]);
@@ -139,7 +133,7 @@ export function TextPrompt(): ReactElement {
       }
       if (numberOfBestTimesUnderTen >= 2) {
         setChordingEnabled(true);
-        setNumberOfWordsChorded();
+        setNumberOfWordsChorded(numberOfWordsChorded);
         // console.log("setChordingEnabled "+ numberOfWordsChorded)
       }
       setBestKeyTime([]);
@@ -564,17 +558,33 @@ export function TextPrompt(): ReactElement {
     return newTargetLine;
   }
   //This function Handles the focus panel
-  function isFocused() {
+  function checkIsFocused() {
     const inputValue = document.getElementById(
       'chordsInput',
     ) as HTMLInputElement;
     const isFocused = document.activeElement === inputValue;
-    if (!isFocused) {
-      return TextBlurredScreen();
-    } else {
-      setTextPromptUnFocused(false);
-    }
+    return isFocused;
   }
+
+  // Use useEffect to update focus state when needed
+  useEffect(() => {
+    const inputValue = document.getElementById(
+      'chordsInput',
+    ) as HTMLInputElement;
+    if (inputValue) {
+      const handleFocus = () => setTextPromptUnFocused(false);
+      const handleBlur = () => setTextPromptUnFocused(true);
+
+      inputValue.addEventListener('focus', handleFocus);
+      inputValue.addEventListener('blur', handleBlur);
+
+      return () => {
+        inputValue.removeEventListener('focus', handleFocus);
+        inputValue.removeEventListener('blur', handleBlur);
+      };
+    }
+  }, [setTextPromptUnFocused]);
+
   //const targetCompareText = setS.slice(setS?.length - firstLineOfTargetText?.length);
   const currentPos =
     storedTestTextData?.length -
@@ -590,7 +600,7 @@ export function TextPrompt(): ReactElement {
       <div className="text-red-500" />
 
       <TextPromptContainer>
-        {textPromptUnFocused ? isFocused() : isFocused()}
+        {textPromptUnFocused && <TextBlurredScreen />}
         {previousTargetTextLineOne != null && (
           <React.Fragment>
             <PreviousChordRow scenario={currentTrainingScenario}>
