@@ -1,4 +1,3 @@
-import { useStoreActions } from 'easy-peasy';
 import React, { ReactElement } from 'react';
 import { createChord } from '../../../models/managerModels';
 
@@ -16,6 +15,7 @@ import {
   createEmptyChordStatisticsFromDevice,
 } from '../../../models/trainingStatistics';
 import { asyncCallForDownloadChords } from '../controls/mainControls';
+import { useStoreActions } from '@/store/store';
 
 export async function getGetAll() {
   const tab = [];
