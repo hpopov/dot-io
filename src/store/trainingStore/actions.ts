@@ -608,12 +608,18 @@ function checkIfErrorExistsInUserEnteredText(
     const isError = !String(storeState.targetWord)?.startsWith(
       storeState.typedTrainingText,
     );
-    if (isError) actions.setErrorOccurredWhileAttemptingToTypeTargetChord(true);
+    actions.setErrorOccurredWhileAttemptingToTypeTargetChord(isError);
   } else if (storeState.typedTrainingText.includes(' ')) {
     const isError = !String(storeState.targetWord + ' ')?.startsWith(
       storeState.typedTrainingText,
     );
-    if (isError) actions.setErrorOccurredWhileAttemptingToTypeTargetChord(true);
+    actions.setErrorOccurredWhileAttemptingToTypeTargetChord(isError);
+  } else {
+    // For non-alphabet modes without space, check if current text matches the beginning of target
+    const isError = !String(storeState.targetWord)?.startsWith(
+      storeState.typedTrainingText,
+    );
+    actions.setErrorOccurredWhileAttemptingToTypeTargetChord(isError);
   }
 }
 
