@@ -645,9 +645,9 @@ function resetTargetChordMetaInformation(state: TrainingStoreModel) {
   state.timeOfLastChordStarted = performance.now();
 }
 
-export async function calculateStatisticsForTargetChord(
+export function calculateStatisticsForTargetChord(
   store: TrainingStoreModel,
-): Promise<void> {
+): void {
   const id = store.targetWord as unknown as string;
   if (!id) {
     return;
@@ -819,12 +819,13 @@ export async function calculateStatisticsForTargetChord(
     );
 
     if (userIsTypingFirstChord) {
-      if (chordStats.numberOfOccurrences != 0)
-        chordStats.numberOfOccurrences = chordStats.numberOfOccurrences - 1;
-      else {
-        chordStats.numberOfOccurrences = chordStats.numberOfOccurrences - 1;
-      }
-      console.log('Calculating hthe occurence and subtracting');
+      // Don't count the first chord to avoid negative occurrence counts
+      // The first chord is a warm-up and shouldn't affect statistics
+      chordStats.numberOfOccurrences = Math.max(
+        0,
+        chordStats.numberOfOccurrences - 1,
+      );
+      console.log('Calculating the occurence and subtracting');
     } else {
       chordStats.numberOfOccurrences =
         chordStats.numberOfOccurrences + numberOfOccurences;

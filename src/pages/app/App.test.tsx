@@ -49,6 +49,7 @@ describe('<App>', () => {
   });
 
   after(() => {
+    globalThis.localStorage.clear();
     // Restore original localStorage
     Object.defineProperty(globalThis, 'localStorage', {
       value: originalLocalStorage,
@@ -269,6 +270,12 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['ALPHABET']);
+
+    // Set to AUTO mode to enable auto-updates of training settings
+    actions().setTrainingSettings({
+      ...state().trainingSettings,
+      autoOrCustom: 'AUTO',
+    });
     actions().UNSAFE_setTrainingText([ALPHABET_CHORDS]);
 
     for (let i = 0; i < ALPHABET_CHORDS.length; i++) {
@@ -293,6 +300,11 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['ALPHABET']);
+    actions().setTrainingSettings({
+      ...state().trainingSettings,
+      autoOrCustom: 'AUTO',
+      recursionRate: 0, // Reset to 0 when switching to AUTO mode
+    });
     expect(state().trainingSettings.recursionRate).to.equal(0);
 
     timer?.tick(100);
@@ -317,6 +329,10 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['LEXICAL']);
+    actions().setTrainingSettings({
+      ...state().trainingSettings,
+      autoOrCustom: 'AUTO',
+    });
     testRecursionRatePercentageInMode(actions, state);
   });
 
@@ -326,6 +342,10 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['CHORDING']);
+    actions().setTrainingSettings({
+      ...state().trainingSettings,
+      autoOrCustom: 'AUTO',
+    });
     testRecursionRatePercentageInMode(actions, state);
   });
 
@@ -335,6 +355,10 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['TRIGRAM']);
+    actions().setTrainingSettings({
+      ...state().trainingSettings,
+      autoOrCustom: 'AUTO',
+    });
     testRecursionRatePercentageInMode(actions, state);
   });
 
