@@ -102,11 +102,11 @@ describe('<App>', () => {
     for (let i = 0; i < firstLineLength; i++)
       actions().setTypedTrainingText(state().trainingText[0][i]);
 
-    expect(state().trainingText.length).to.equal(3);
+    expect(state().trainingText.length).to.equal(4);
 
     actions().resetTrainingText();
 
-    expect(state().trainingText.length).to.equal(2);
+    expect(state().trainingText.length).to.equal(3);
   });
 
   it('does not prompt for spacebar after key in alphabet mode, but does for all other modes', () => {

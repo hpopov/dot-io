@@ -115,10 +115,10 @@ const trainingStoreActions: TrainingStoreActionsModel = {
       localStorage?.getItem('chordsReadFromDevice'),
     );
   }),
-  setStartTimer: action((state, payload) => {
+  setStartTimer: action<TrainingStoreModel>((state, payload) => {
     state.startTimer = payload as boolean;
   }),
-  setTrainingTestCounter: action((state, payload) => {
+  setTrainingTestCounter: action<TrainingStoreModel>((state, payload) => {
     state.trainingTestCounter = payload;
   }),
   setModuleCompleteModalToggle: action((state, payload) => {
@@ -140,13 +140,13 @@ const trainingStoreActions: TrainingStoreActionsModel = {
   setIsDisplayingIntroductionModal: action((state, payload) => {
     state.isDisplayingIntroductionModal = payload as boolean;
   }),
-  setTrainingIsDone: action((state, payload) => {
+  setTrainingIsDone: action<TrainingStoreModel>((state, payload) => {
     state.trainingIsDone = payload as boolean;
   }),
-  setTimerValue: action((state, payload) => {
+  setTimerValue: action<TrainingStoreModel>((state, payload) => {
     state.timerValue = payload;
   }),
-  setLexicalSentencesIndex: action((state, payload) => {
+  setLexicalSentencesIndex: action<TrainingStoreModel>((state, payload) => {
     state.lexicalSentencesIndex = payload;
   }),
 
@@ -446,6 +446,7 @@ const trainingStoreActions: TrainingStoreActionsModel = {
     store.currentSubindexInTrainingText = 0;
     generateNextLineOfInputdata(store as unknown as TrainingStoreStateModel);
     generateNextLineOfInputdata(store as unknown as TrainingStoreStateModel);
+    generateNextLineOfInputdata(store as unknown as TrainingStoreStateModel);
   }),
   setTypedTrainingText: action((state, payload) => {
     state.typedTrainingText = payload;
@@ -589,6 +590,7 @@ function checkIfShouldProceedToNextTargetChord(
     ) == ' ' &&
     !isPhrase &&
     storeState.typedTrainingText.length > 0 &&
+    wordValue != undefined &&
     wordValue[0] != ' ' &&
     wordValue[0] != undefined
   ) {
@@ -1057,7 +1059,7 @@ function moveIndiciesOfTargetChord(state: TrainingStoreModel): void {
     isReadyToAdvanceToNextLineOfTrainingText &&
     state.targetTextLineFour == null
   ) {
-    //Cehck if the user did backspace
+    //Check if the user did backspace
     state.currentLineOfTrainingText += 1;
     state.currentSubindexInTrainingText = 0;
     generateNextLineOfInputdata(state);
