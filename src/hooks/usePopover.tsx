@@ -32,7 +32,7 @@ export default function usePopover(text: string): {
     const tf = [];
     for (let i = 0; i < tt.length; i++) {
       tf.push(tt[i]);
-      tf.push(<br />);
+      tf.push(<br key={`br-${i}`} />);
     }
     return tf;
   }
