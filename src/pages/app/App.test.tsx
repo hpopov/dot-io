@@ -8,14 +8,48 @@ const ALPHABET_CHORDS = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
 describe('<App>', () => {
   let timer: IMockPerformance | null;
+  let originalLocalStorage: Storage;
+  let mockStorage: Record<string, string>;
 
   beforeEach(() => {
+    // Mock localStorage to isolate tests from user's saved data
+    originalLocalStorage = globalThis.localStorage;
+    mockStorage = {};
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: {
+        getItem: (key: string) => mockStorage[key] || null,
+        setItem: (key: string, value: string) => {
+          mockStorage[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete mockStorage[key];
+        },
+        clear: () => {
+          mockStorage = {};
+        },
+        get length() {
+          return Object.keys(mockStorage).length;
+        },
+        key: (index: number) => Object.keys(mockStorage)[index] || null,
+      },
+      writable: true,
+      configurable: true,
+    });
+
     timer = mockPerformance();
   });
 
   afterEach(() => {
     timer?.uninstall();
     timer = null;
+
+    // Restore original localStorage
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: originalLocalStorage,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('can successfully create a store', () => {
@@ -206,6 +240,12 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['ALPHABET']);
+
+    // Set to AUTO mode to enable auto-updates of training settings
+    actions().setTrainingSettings({
+      ...state().trainingSettings,
+      autoOrCustom: 'AUTO',
+    });
 
     const firstChord = state().targetWord + '';
     actions().setTypedTrainingText(firstChord);
