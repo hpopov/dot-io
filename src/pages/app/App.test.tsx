@@ -11,9 +11,9 @@ describe('<App>', () => {
   let originalLocalStorage: Storage;
   let mockStorage: Record<string, string>;
 
-  beforeEach(() => {
-    // Mock localStorage to isolate tests from user's saved data
+  before(() => {
     originalLocalStorage = globalThis.localStorage;
+    // Mock localStorage to isolate tests from user's saved data
     mockStorage = {};
 
     Object.defineProperty(globalThis, 'localStorage', {
@@ -36,14 +36,19 @@ describe('<App>', () => {
       writable: true,
       configurable: true,
     });
+  });
 
+  beforeEach(() => {
+    globalThis.localStorage.clear();
     timer = mockPerformance();
   });
 
   afterEach(() => {
     timer?.uninstall();
     timer = null;
+  });
 
+  after(() => {
     // Restore original localStorage
     Object.defineProperty(globalThis, 'localStorage', {
       value: originalLocalStorage,
