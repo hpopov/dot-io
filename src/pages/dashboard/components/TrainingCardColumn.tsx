@@ -6,6 +6,7 @@ import type { ChordStatistics } from '../../../models/trainingStatistics';
 import { useStoreActions, useStoreState } from '../../../store/store';
 import trainingCardProps from './TrainingCardProps';
 import { TierCardProps, TrainingTierCard } from './TrainingTierCard';
+import { TierText } from './TrainingTierCard.styled';
 
 export function TrainingCardColumn(): ReactElement {
   const history = useHistory();
@@ -34,7 +35,7 @@ export function TrainingCardColumn(): ReactElement {
     <CardColumn>
       {trainingCardProps.map((allProps, i) => (
         <TrainingTierCard
-          key={Math.random()}
+          key={allProps.tierTitle}
           statistics={getStatsFromIndex(i)}
           onPressTraining={onPressTierCard(allProps)}
           {...allProps}

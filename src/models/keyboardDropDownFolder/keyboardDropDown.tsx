@@ -109,11 +109,11 @@ function DropDown(): ReactElement {
           {isOpen && (
             <DropDownListContainer>
               <DropDownList>
-                {options.map((option) => (
+                {options.map((option, i) => (
                   <ListItem
                     className="cursor-pointer"
                     onClick={onOptionClicked(option)}
-                    key={Math.random()}
+                    key={`option-${i}`}
                   >
                     {option}
                   </ListItem>

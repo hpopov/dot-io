@@ -154,7 +154,7 @@ function EditChordsModal(): ReactElement {
                       onClick={() => {
                         removeChord(index);
                       }}
-                      key={Math.random()}
+                      key={`chord-${index}`}
                     >
                       <Chord>{chord}</Chord>
                       <XIcon />

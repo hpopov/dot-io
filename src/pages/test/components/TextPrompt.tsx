@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import type { TrainingScenario } from '../../../../src/models/trainingScenario';
 import { useStoreActions, useStoreState } from '../../../store/store';
 
-const r = Math.random;
-
 export function TextBlurredScreen() {
   const setTextPromptUnFocused = useStoreActions(
     (store) => store.setTextPromptUnFocused,
@@ -48,6 +46,7 @@ export function TextPrompt(): ReactElement {
   const fourthLineOfTargetText = useStoreState(
     (store) => store.targetTextLineFour,
   );
+  const currentLine = useStoreState((store) => store.currentLineOfTrainingText);
   const isError = useStoreState(
     (store) => store.errorOccurredWhileAttemptingToTypeTargetChord,
   );
@@ -630,7 +629,7 @@ export function TextPrompt(): ReactElement {
               {(colorTargetLine(previousTargetTextLineOne) || [])?.map(
                 (chord, index) => (
                   <Chord
-                    key={r()}
+                    key={`prev-target-chord-${index}`}
                     error={
                       !(currentTrainingScenario != 'ALPHABET'
                         ? allTypedText[currentPos + index]?.slice(0, -1) ===
@@ -653,34 +652,32 @@ export function TextPrompt(): ReactElement {
           </React.Fragment>
         )}
         <ChordRow scenario={currentTrainingScenario}>
-          {(colorTargetLine(firstLineOfTargetText) || [])?.map(
-            (chord: any, i: any) => {
-              if (characterEntryMode === 'CHORD' || i !== indexOfTargetChord) {
-                return (
-                  <Chord
-                    key={r()}
-                    active={i === indexOfTargetChord}
-                    error={isError && i === indexOfTargetChord}
-                  >
-                    {chord}
-                  </Chord>
-                );
-              } else {
-                {
-                  ChordingEnabledAlgorithm(chord);
-                } //This call checks to see if the a chorded device was used
-                /* eslint-disable */
-                return (
-                  <CharacterEntryChord
-                    key={`entry-${i}`}
-                    word={chord}
-                    index={targetCharacterIndex}
-                  />
-                );
-                /* eslint-disable */
-              }
-            },
-          )}
+          {(colorTargetLine(firstLineOfTargetText) || [])?.map((chord, i) => {
+            if (characterEntryMode === 'CHORD' || i !== indexOfTargetChord) {
+              return (
+                <Chord
+                  key={`chord-${i}`}
+                  active={i === indexOfTargetChord}
+                  error={isError && i === indexOfTargetChord}
+                >
+                  {chord}
+                </Chord>
+              );
+            } else {
+              {
+                ChordingEnabledAlgorithm(chord);
+              } //This call checks to see if the a chorded device was used
+              /* eslint-disable */
+              return (
+                <CharacterEntryChord
+                  key={`entry-${i}`}
+                  word={chord}
+                  index={targetCharacterIndex}
+                />
+              );
+              /* eslint-disable */
+            }
+          })}
         </ChordRow>
         <ChordRow scenario={currentTrainingScenario}>
           {letsFix(
@@ -691,8 +688,8 @@ export function TextPrompt(): ReactElement {
           )}
         </ChordRow>
         <ChordRow scenario={currentTrainingScenario}>
-          {(secondLineOfTargetText || [])?.map((chord) => (
-            <Chord key={r()}>{chord}</Chord>
+          {(secondLineOfTargetText || [])?.map((chord, i) => (
+            <Chord key={`chord-${currentLine}+1-${i}`}>{chord}</Chord>
           ))}
         </ChordRow>
 
@@ -700,8 +697,8 @@ export function TextPrompt(): ReactElement {
           <React.Fragment>
             <Spacer></Spacer>
             <ChordRow scenario={currentTrainingScenario}>
-              {(thirdLineOfTargetText || [])?.map((chord) => (
-                <Chord key={r()}>{chord}</Chord>
+              {(thirdLineOfTargetText || [])?.map((chord, i) => (
+                <Chord key={`chord-${currentLine}-1-${i}`}>{chord}</Chord>
               ))}
             </ChordRow>
           </React.Fragment>
@@ -719,11 +716,7 @@ export default function CharacterEntryChord({
   index: number | undefined;
 }): ReactElement {
   if (index === undefined || index === null)
-    return (
-      <span className="text-black whitespace-pre-wrap" key={Math.random()}>
-        {word}
-      </span>
-    );
+    return <span className="text-black whitespace-pre-wrap">{word}</span>;
 
   const wordSplit = word.split('');
 
@@ -731,16 +724,16 @@ export default function CharacterEntryChord({
     <div
       style={{ whiteSpace: 'pre-wrap', flexDirection: 'row', color: 'gray' }}
     >
-      {wordSplit.slice(0, index).map((char) => (
-        <span className="text-black whitespace-pre-wrap" key={Math.random()}>
+      {wordSplit.slice(0, index).map((char, i) => (
+        <span className="text-black whitespace-pre-wrap" key={`before-${i}`}>
           {char}
         </span>
       ))}
       <span className="text-white bg-black whitespace-pre-wrap">
         {wordSplit[index]}
       </span>
-      {wordSplit.slice(index + 1).map((char) => (
-        <span className="text-grey" key={Math.random()}>
+      {wordSplit.slice(index + 1).map((char, i) => (
+        <span className="text-grey" key={`after-${i}`}>
           {char}
         </span>
       ))}
