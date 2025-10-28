@@ -796,9 +796,12 @@ export async function calculateStatisticsForTargetChord(
   }
 
   // Never let the last speed go above 500 milliseconds so the user's times dont get ruined if the walk away from their desk
-  if (store.currentTrainingScenario != 'ALLCHORDS' && !userIsTypingFirstChord) {
+  if (store.currentTrainingScenario != 'ALLCHORDS') {
+    // For the first chord, use a minimal time instead of 0 to ensure statistics are tracked
+    const effectiveTime = userIsTypingFirstChord ? 1 : timeTakenToTypeChord;
+
     chordStats.lastSpeed = Math.min(
-      timeTakenToTypeChord,
+      effectiveTime,
       MAXIMUM_ALLOWED_SPEED_FOR_CHORD_STATS,
     );
     store.timeTakenToTypePreviousChord = chordStats?.lastSpeed;
