@@ -5,7 +5,7 @@ import HelpCircleIcon from '../../pages/test/components/HelpCircleIcon';
 import usePopover from '../../hooks/usePopover';
 
 export let pickerLite = false;
-export let pickerV1 = false;
+export let pickerV1 = true; // Default to CharaChorder One
 export let pickerNone = false;
 
 const options = ['No Device Preview', 'CharaChorder Lite', 'CharaChorder One'];

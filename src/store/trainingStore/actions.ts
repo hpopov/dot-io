@@ -38,6 +38,7 @@ const ALPHABET_LINE_LENGTH = 24;
 
 const dictNameOfLibrary = {
   ALPHABET: chordLibrary.letters,
+  CHORDING: chordLibrary.chords,
   LEXICAL: chordLibrary.lexical,
   ENGLISH: chordLibrary.lexical,
   TRIGRAM: chordLibrary.trigrams,
@@ -232,13 +233,17 @@ const trainingStoreActions: TrainingStoreActionsModel = {
     if (
       state.currentTrainingScenario != 'ALLCHORDS' &&
       state.trainingLevel != 'StM'
-    )
-      state.trainingStatistics = JSON.parse(
-        localStorage.getItem(
-          state.trainingLevel + '_' + state.currentTrainingScenario,
-        ),
+    ) {
+      const storedStats = localStorage.getItem(
+        state.trainingLevel + '_' + state.currentTrainingScenario,
       );
-    else if (state.trainingLevel == 'StM') {
+      state.trainingStatistics = storedStats
+        ? JSON.parse(storedStats)
+        : generateEmptyChordStatistics(
+            state.chordsToPullFrom,
+            state.currentTrainingScenario,
+          );
+    } else if (state.trainingLevel == 'StM') {
       state.trainingStatistics = generateEmptyChordStatistics(
         state?.chordsToPullFrom[state?.lexicalSentencesIndex],
         payload[0] as TrainingScenario,
