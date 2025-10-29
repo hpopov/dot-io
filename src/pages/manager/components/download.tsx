@@ -1,24 +1,21 @@
 import React, { ReactElement } from 'react';
-import { useStoreState, useStoreActions } from 'easy-peasy';
 import { createChord } from '../../../models/managerModels';
 
+import { resetDataTable } from '../../manager/components/resetDataTable';
 import {
-  MainControls,
-  sendCommandString,
-  selectBase,
-  readGetOneChordmap,
   convertHexadecimalChordToHumanChordForAllChordsTier,
   convertHexadecimalPhraseToAsciiString,
+  MainControls,
+  readGetOneChordmap,
+  sendCommandString,
 } from '../controls/mainControls';
-import { resetDataTable } from '../../manager/components/resetDataTable';
-import { ChordMapColumn } from './ChordMapCardColumn';
 
 import {
   ChordStatisticsFromDevice,
   createEmptyChordStatisticsFromDevice,
 } from '../../../models/trainingStatistics';
 import { asyncCallForDownloadChords } from '../controls/mainControls';
-import { render } from 'react-dom';
+import { useStoreActions } from '@/store/store';
 
 export async function getGetAll() {
   const tab = [];

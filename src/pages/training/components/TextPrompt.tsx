@@ -2,12 +2,11 @@ import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 import { useStoreState } from '../../../store/store';
 
-const r = Math.random;
-
 export function TextPrompt(): ReactElement {
   const indexOfTargetChord = useStoreState(
     (store) => store.currentSubindexInTrainingText,
   );
+  const currentLine = useStoreState((store) => store.currentLineOfTrainingText);
   const firstLineOfTargetText = useStoreState(
     (store) => store.targetTextLineOne,
   );
@@ -29,7 +28,7 @@ export function TextPrompt(): ReactElement {
           if (characterEntryMode === 'CHORD' || i !== indexOfTargetChord)
             return (
               <Chord
-                key={r()}
+                key={`chord-${currentLine}-${i}`}
                 active={i === indexOfTargetChord}
                 error={isError && i === indexOfTargetChord}
               >
@@ -38,14 +37,18 @@ export function TextPrompt(): ReactElement {
             );
           else
             return (
-              <CharacterEntryChord word={chord} index={targetCharacterIndex} />
+              <CharacterEntryChord
+                key={`character-${currentLine}-${i}`}
+                word={chord}
+                index={targetCharacterIndex}
+              />
             );
         })}
       </ChordRow>
 
       <ChordRow>
-        {(secondLineOfTargetText || [])?.map((chord) => (
-          <Chord key={r()}>{chord}</Chord>
+        {(secondLineOfTargetText || [])?.map((chord, i) => (
+          <Chord key={`chord-${currentLine}+1-${i}`}>{chord}</Chord>
         ))}
       </ChordRow>
     </TextPromptContainer>
@@ -60,23 +63,19 @@ export default function CharacterEntryChord({
   index: number | undefined;
 }): ReactElement {
   if (index === undefined || index === null)
-    return (
-      <span className="text-green-500" key={Math.random()}>
-        {word}
-      </span>
-    );
+    return <span className="text-green-500">{word}</span>;
 
   const wordSplit = word.split('');
   return (
     <div style={{ display: 'flex', flexDirection: 'row', color: 'red' }}>
-      {wordSplit.slice(0, index).map((char) => (
-        <span className="text-green-500" key={Math.random()}>
+      {wordSplit.slice(0, index).map((char, i) => (
+        <span className="text-green-500" key={`before-${i}`}>
           {char}
         </span>
       ))}
       <span className="text-blue-500">{wordSplit[index]}</span>
-      {wordSplit.slice(index + 1).map((char) => (
-        <span className="text-white" key={Math.random()}>
+      {wordSplit.slice(index + 1).map((char, i) => (
+        <span className="text-white" key={`after-${i}`}>
           {char}
         </span>
       ))}

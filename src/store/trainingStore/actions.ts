@@ -38,6 +38,7 @@ const ALPHABET_LINE_LENGTH = 24;
 
 const dictNameOfLibrary = {
   ALPHABET: chordLibrary.letters,
+  CHORDING: chordLibrary.chords,
   LEXICAL: chordLibrary.lexical,
   ENGLISH: chordLibrary.lexical,
   TRIGRAM: chordLibrary.trigrams,
@@ -114,10 +115,10 @@ const trainingStoreActions: TrainingStoreActionsModel = {
       localStorage?.getItem('chordsReadFromDevice'),
     );
   }),
-  setStartTimer: action((state, payload) => {
+  setStartTimer: action<TrainingStoreModel>((state, payload) => {
     state.startTimer = payload as boolean;
   }),
-  setTrainingTestCounter: action((state, payload) => {
+  setTrainingTestCounter: action<TrainingStoreModel>((state, payload) => {
     state.trainingTestCounter = payload;
   }),
   setModuleCompleteModalToggle: action((state, payload) => {
@@ -139,13 +140,13 @@ const trainingStoreActions: TrainingStoreActionsModel = {
   setIsDisplayingIntroductionModal: action((state, payload) => {
     state.isDisplayingIntroductionModal = payload as boolean;
   }),
-  setTrainingIsDone: action((state, payload) => {
+  setTrainingIsDone: action<TrainingStoreModel>((state, payload) => {
     state.trainingIsDone = payload as boolean;
   }),
-  setTimerValue: action((state, payload) => {
+  setTimerValue: action<TrainingStoreModel>((state, payload) => {
     state.timerValue = payload;
   }),
-  setLexicalSentencesIndex: action((state, payload) => {
+  setLexicalSentencesIndex: action<TrainingStoreModel>((state, payload) => {
     state.lexicalSentencesIndex = payload;
   }),
 
@@ -178,28 +179,11 @@ const trainingStoreActions: TrainingStoreActionsModel = {
     state.storedChordsFromDevice = JSON?.parse(
       localStorage?.getItem('chordsReadFromDevice'),
     );
-    if (
-      state.currentTrainingScenario !=
-      ('ALLCHORDS' ||
-        'LEXICOGRAPHIC' ||
-        'LEXICALSENTENCES' ||
-        'LEXICALSENTENCESDUOS' ||
-        'LEXICALSENTENCESTRIOS')
-    )
-      oneTimeCreateStoredChordStats(
-        state.currentTrainingScenario,
-        state.trainingLevel,
-        dictNameOfLibrary[state.currentTrainingScenario],
-      );
-    else if (
-      state.currentTrainingScenario !=
-      ('LEXICALSENTENCES' || 'LEXICALSENTENCESDUOS' || 'LEXICALSENTENCESTRIOS')
-    )
-      oneTimeCreateStoredChordStats(
-        state.currentTrainingScenario,
-        state.trainingLevel,
-        dictNameOfLibrary[state.currentTrainingScenario],
-      );
+    oneTimeCreateStoredChordStats(
+      state.currentTrainingScenario,
+      state.trainingLevel,
+      dictNameOfLibrary[state.currentTrainingScenario],
+    );
     //This data set is created in the TrainingModeSelector.tsx
     state.storedChordStatistics = JSON?.parse(
       localStorage?.getItem(state.trainingLevel + '_' + payload[0]),
@@ -441,6 +425,7 @@ const trainingStoreActions: TrainingStoreActionsModel = {
     store.currentSubindexInTrainingText = 0;
     generateNextLineOfInputdata(store as unknown as TrainingStoreStateModel);
     generateNextLineOfInputdata(store as unknown as TrainingStoreStateModel);
+    generateNextLineOfInputdata(store as unknown as TrainingStoreStateModel);
   }),
   setTypedTrainingText: action((state, payload) => {
     state.typedTrainingText = payload;
@@ -551,7 +536,10 @@ function checkIfShouldProceedToNextTargetChord(
   storeState: TrainingStoreStateModel,
   actions: Actions<TrainingStoreModel>,
 ) {
-  const wordValue = document.getElementById('chordsInput')?.value;
+  const wordValueFromDom = document.getElementById(
+    'chordsInput',
+  ) as HTMLInputElement | null;
+  const wordValue = wordValueFromDom?.value ?? storeState.typedTrainingText;
   const wordToCompare = isInAlphabetMode
     ? storeState.targetWord
     : storeState.targetWord + ' ';
@@ -584,6 +572,7 @@ function checkIfShouldProceedToNextTargetChord(
     ) == ' ' &&
     !isPhrase &&
     storeState.typedTrainingText.length > 0 &&
+    wordValue != undefined &&
     wordValue[0] != ' ' &&
     wordValue[0] != undefined
   ) {
@@ -619,12 +608,18 @@ function checkIfErrorExistsInUserEnteredText(
     const isError = !String(storeState.targetWord)?.startsWith(
       storeState.typedTrainingText,
     );
-    if (isError) actions.setErrorOccurredWhileAttemptingToTypeTargetChord(true);
+    actions.setErrorOccurredWhileAttemptingToTypeTargetChord(isError);
   } else if (storeState.typedTrainingText.includes(' ')) {
     const isError = !String(storeState.targetWord + ' ')?.startsWith(
       storeState.typedTrainingText,
     );
-    if (isError) actions.setErrorOccurredWhileAttemptingToTypeTargetChord(true);
+    actions.setErrorOccurredWhileAttemptingToTypeTargetChord(isError);
+  } else {
+    // For non-alphabet modes without space, check if current text matches the beginning of target
+    const isError = !String(storeState.targetWord)?.startsWith(
+      storeState.typedTrainingText,
+    );
+    actions.setErrorOccurredWhileAttemptingToTypeTargetChord(isError);
   }
 }
 
@@ -650,9 +645,9 @@ function resetTargetChordMetaInformation(state: TrainingStoreModel) {
   state.timeOfLastChordStarted = performance.now();
 }
 
-export async function calculateStatisticsForTargetChord(
+export function calculateStatisticsForTargetChord(
   store: TrainingStoreModel,
-): Promise<void> {
+): void {
   const id = store.targetWord as unknown as string;
   if (!id) {
     return;
@@ -801,9 +796,12 @@ export async function calculateStatisticsForTargetChord(
   }
 
   // Never let the last speed go above 500 milliseconds so the user's times dont get ruined if the walk away from their desk
-  if (store.currentTrainingScenario != 'ALLCHORDS' && !userIsTypingFirstChord) {
+  if (store.currentTrainingScenario != 'ALLCHORDS') {
+    // For the first chord, use a minimal time instead of 0 to ensure statistics are tracked
+    const effectiveTime = userIsTypingFirstChord ? 1 : timeTakenToTypeChord;
+
     chordStats.lastSpeed = Math.min(
-      timeTakenToTypeChord,
+      effectiveTime,
       MAXIMUM_ALLOWED_SPEED_FOR_CHORD_STATS,
     );
     store.timeTakenToTypePreviousChord = chordStats?.lastSpeed;
@@ -821,12 +819,13 @@ export async function calculateStatisticsForTargetChord(
     );
 
     if (userIsTypingFirstChord) {
-      if (chordStats.numberOfOccurrences != 0)
-        chordStats.numberOfOccurrences = chordStats.numberOfOccurrences - 1;
-      else {
-        chordStats.numberOfOccurrences = chordStats.numberOfOccurrences - 1;
-      }
-      console.log('Calculating hthe occurence and subtracting');
+      // Don't count the first chord to avoid negative occurrence counts
+      // The first chord is a warm-up and shouldn't affect statistics
+      chordStats.numberOfOccurrences = Math.max(
+        0,
+        chordStats.numberOfOccurrences - 1,
+      );
+      console.log('Calculating the occurence and subtracting');
     } else {
       chordStats.numberOfOccurrences =
         chordStats.numberOfOccurrences + numberOfOccurences;
@@ -1052,7 +1051,7 @@ function moveIndiciesOfTargetChord(state: TrainingStoreModel): void {
     isReadyToAdvanceToNextLineOfTrainingText &&
     state.targetTextLineFour == null
   ) {
-    //Cehck if the user did backspace
+    //Check if the user did backspace
     state.currentLineOfTrainingText += 1;
     state.currentSubindexInTrainingText = 0;
     generateNextLineOfInputdata(state);

@@ -11,7 +11,7 @@ export function ChordLayoutColumn(): ReactElement {
   return (
     <CardLayoutColumn>
       {downloadedChordLayout.map((props, index) => (
-        <ChordLayoutCard key={Math.random()} {...props} index={index} />
+        <ChordLayoutCard key={`keymap-${index}`} {...props} index={index} />
       ))}
     </CardLayoutColumn>
   );

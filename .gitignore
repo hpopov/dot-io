@@ -1,13 +1,27 @@
-.snowpack
+# Vite
+dist
+.vite
+
+# Build output
 build
+
+# Dependencies
 node_modules
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
 .DS_Store
 .vscode
+
+# Project specific
 test.txt
 src/helpers/highlightConversion.js
 ci-cd/.env.js
 coverage
 ci-cd/.env
-.env
 test_run_output.txt
 backend

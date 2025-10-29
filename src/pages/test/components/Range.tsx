@@ -234,6 +234,7 @@ export const MultiRangeSlider = (
           max={max}
           step={step}
           value={minValue}
+          readOnly
         />
         <div
           className="thumb thumb-left absolute"
@@ -257,6 +258,7 @@ export const MultiRangeSlider = (
           max={max}
           step={step}
           value={maxValue}
+          readOnly
         />
         <div
           className="thumb thumb-right absolute"

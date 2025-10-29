@@ -1,9 +1,7 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import type { TrainingScenario } from '../../../../src/models/trainingScenario';
 import { useStoreActions, useStoreState } from '../../../store/store';
-
-const r = Math.random;
 
 export function TextBlurredScreen() {
   const setTextPromptUnFocused = useStoreActions(
@@ -27,82 +25,77 @@ export function TextBlurredScreen() {
 
 export function TextPrompt(): ReactElement {
   const indexOfTargetChord = useStoreState(
-    (store: any) => store.currentSubindexInTrainingText,
+    (store) => store.currentSubindexInTrainingText,
   );
 
   const setTextPromptUnFocused = useStoreActions(
     (store) => store.setTextPromptUnFocused,
   );
   const previousTargetTextLineOne = useStoreState(
-    (store: any) => store.previousTargetTextLineOne,
+    (store) => store.previousTargetTextLineOne,
   );
   const firstLineOfTargetText = useStoreState(
-    (store: any) => store.targetTextLineOne,
+    (store) => store.targetTextLineOne,
   );
   const secondLineOfTargetText = useStoreState(
-    (store: any) => store.targetTextLineTwo,
+    (store) => store.targetTextLineTwo,
   );
   const thirdLineOfTargetText = useStoreState(
-    (store: any) => store.targetTextLineThree,
+    (store) => store.targetTextLineThree,
   );
   const fourthLineOfTargetText = useStoreState(
-    (store: any) => store.targetTextLineFour,
+    (store) => store.targetTextLineFour,
   );
+  const currentLine = useStoreState((store) => store.currentLineOfTrainingText);
   const isError = useStoreState(
-    (store: any) => store.errorOccurredWhileAttemptingToTypeTargetChord,
+    (store) => store.errorOccurredWhileAttemptingToTypeTargetChord,
   );
 
   const textPromptUnFocused = useStoreState(
     (store) => store.textPromptUnFocused,
   );
   const targetCharacterIndex = useStoreState(
-    (store: any) => store.targetCharacterIndex,
+    (store) => store.targetCharacterIndex,
   );
-  const characterEntryMode = useStoreState(
-    (store: any) => store.characterEntryMode,
-  );
+  const characterEntryMode = useStoreState((store) => store.characterEntryMode);
   const storeAllTypedText = useStoreActions(
-    (store: any) => store.setAllTypedCharactersStore,
+    (store) => store.setAllTypedCharactersStore,
   );
-  const allTypedText = useStoreState(
-    (store: any) => store.allTypedCharactersStore,
-  );
+  const allTypedText = useStoreState((store) => store.allTypedCharactersStore);
   const trainingTestCounter = useStoreState(
-    (store: any) => store.trainingTestCounter,
+    (store) => store.trainingTestCounter,
   );
   const setTrainingTestCounter = useStoreActions(
-    (store: any) => store.setTrainingTestCounter,
+    (store) => store.setTrainingTestCounter,
   );
   const currentTrainingScenario = useStoreState(
-    (store: any) => store.currentTrainingScenario,
+    (store) => store.currentTrainingScenario,
   );
   const setTypedTrainingText = useStoreActions(
-    (store: any) => store.setTypedTrainingText,
+    (store) => store.setTypedTrainingText,
   );
-  const storedTestTextData = useStoreState(
-    (store: any) => store.storedTestTextData,
-  );
-  const setS = useStoreState((store: any) => store.compareText);
+  const storedTestTextData = useStoreState((store) => store.storedTestTextData);
+  const setS = useStoreState((store) => store.compareText);
   const setCurrentSubindexInTrainingText = useStoreActions(
-    (store: any) => store.setCurrentSubindexInTrainingText,
+    (store) => store.setCurrentSubindexInTrainingText,
   );
   const setEditingPreviousWord = useStoreActions(
     (store) => store.setUserIsEditingPreviousWord,
   );
   const isEditingPreviousWord = useStoreState(
-    (store: any) => store.userIsEditingPreviousWord,
+    (store) => store.userIsEditingPreviousWord,
   );
   const setChordingEnabled = useStoreActions(
-    (store: any) => store.setIsUsingChordingEnabledDevice,
+    (store) => store.setIsUsingChordingEnabledDevice,
   );
   const setNumberOfWordsChorded = useStoreActions(
-    (store: any) => store.setNumberOfWordsChorded,
+    (store) => store.setNumberOfWordsChorded,
   );
   const numberOfWordsChorded = useStoreState(
-    (store: any) => store.numberOfWordsChorded,
+    (store) => store.numberOfWordsChorded,
   );
   const isChordingEnabled = useStoreState(
-    (store: any) => store.isUsingChordingEnabledDevice,
+    (store) => store.isUsingChordingEnabledDevice,
   );
 
   const [bestKeyTime, setBestKeyTime] = useState([]);
@@ -139,7 +132,7 @@ export function TextPrompt(): ReactElement {
       }
       if (numberOfBestTimesUnderTen >= 2) {
         setChordingEnabled(true);
-        setNumberOfWordsChorded();
+        setNumberOfWordsChorded(numberOfWordsChorded);
         // console.log("setChordingEnabled "+ numberOfWordsChorded)
       }
       setBestKeyTime([]);
@@ -225,7 +218,7 @@ export function TextPrompt(): ReactElement {
           tempBufferInTheFront += '.';
         }
         tempArray.push(
-          <React.Fragment>
+          <React.Fragment key="buffer-fragments">
             <span className="text-white m-0 flex">{tempBufferInTheFront}</span>
             <div className="text-gray-500">{arr}</div>
             <span className="text-white m-0 flex">{tempBufferInTheBack}</span>
@@ -235,7 +228,11 @@ export function TextPrompt(): ReactElement {
         for (let f = 1; f < targetTextLineOne.length; f++) {
           tempValue = targetTextLineOne[f] + ' ';
 
-          tempArray.push(<div className="text-white">{tempValue}</div>);
+          tempArray.push(
+            <div key={`temp-${f}`} className="text-white">
+              {tempValue}
+            </div>,
+          );
         }
 
         displayArray = tempArray;
@@ -268,7 +265,11 @@ export function TextPrompt(): ReactElement {
               placeholder += '*';
             }
 
-            displayArray.push(<div className="text-white">{placeholder}</div>);
+            displayArray.push(
+              <div key={`placeholder-${i}`} className="text-white">
+                {placeholder}
+              </div>,
+            );
 
             spacesBetweenWords = 0;
           } else {
@@ -280,7 +281,7 @@ export function TextPrompt(): ReactElement {
                 periodsIfLengthOfTypedErrorIsLongerThanChordsLength += '.';
               }
               displayArray.push(
-                <div className="text-gray">
+                <div key={`error-${i}`} className="text-gray">
                   {periodsIfLengthOfTypedErrorIsLongerThanChordsLength}
                 </div>,
               );
@@ -305,25 +306,33 @@ export function TextPrompt(): ReactElement {
                   tempCompareValue[t] ==
                   (tempTargetWord[t] == undefined ? '' : tempTargetWord[t])
                     ? thisNewArray.push(
-                        <span className="text-white m-0 flex">
+                        <span
+                          key={`correct-${i}-${t}`}
+                          className="text-white m-0 flex"
+                        >
                           {tempTargetWord[t]}
                         </span>,
                       )
                     : thisNewArray.push(
-                        <span className=" m-0 flex">
+                        <span key={`incorrect-${i}-${t}`} className=" m-0 flex">
                           {tempCompareValue[t]}
                         </span>,
                       );
                 } else {
                   thisNewArray.push(
-                    <span className="text-white m-0 flex">
+                    <span
+                      key={`undefined-${i}-${t}`}
+                      className="text-white m-0 flex"
+                    >
                       {tempTargetWord[t]}
                     </span>,
                   );
                 }
               }
               displayArray.push(
-                <span className="m-0 flex">{thisNewArray}</span>,
+                <span key={`word-${i}`} className="m-0 flex">
+                  {thisNewArray}
+                </span>,
               );
             }
           }
@@ -341,7 +350,11 @@ export function TextPrompt(): ReactElement {
             }
             sd += ' ';
             d == y ? sd == sd.slice(1) : sd;
-            displayArray.push(<div className="text-white">{sd}</div>);
+            displayArray.push(
+              <div key={`remaining-${d}`} className="text-white">
+                {sd}
+              </div>,
+            );
           }
 
           //This piece of code handles the experience while your typing in real time
@@ -360,7 +373,10 @@ export function TextPrompt(): ReactElement {
               frontBufferValues += '.';
             }
             displayArray[indexOfTargetChord] = (
-              <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <div
+                key={`typing-${indexOfTargetChord}`}
+                style={{ display: 'flex', flexDirection: 'row' }}
+              >
                 {frontBufferValues.indexOf('.') != -1 ? (
                   <span className="text-white m-0 flex">
                     {frontBufferValues}
@@ -564,17 +580,33 @@ export function TextPrompt(): ReactElement {
     return newTargetLine;
   }
   //This function Handles the focus panel
-  function isFocused() {
+  function checkIsFocused() {
     const inputValue = document.getElementById(
       'chordsInput',
     ) as HTMLInputElement;
     const isFocused = document.activeElement === inputValue;
-    if (!isFocused) {
-      return TextBlurredScreen();
-    } else {
-      setTextPromptUnFocused(false);
-    }
+    return isFocused;
   }
+
+  // Use useEffect to update focus state when needed
+  useEffect(() => {
+    const inputValue = document.getElementById(
+      'chordsInput',
+    ) as HTMLInputElement;
+    if (inputValue) {
+      const handleFocus = () => setTextPromptUnFocused(false);
+      const handleBlur = () => setTextPromptUnFocused(true);
+
+      inputValue.addEventListener('focus', handleFocus);
+      inputValue.addEventListener('blur', handleBlur);
+
+      return () => {
+        inputValue.removeEventListener('focus', handleFocus);
+        inputValue.removeEventListener('blur', handleBlur);
+      };
+    }
+  }, [setTextPromptUnFocused]);
+
   //const targetCompareText = setS.slice(setS?.length - firstLineOfTargetText?.length);
   const currentPos =
     storedTestTextData?.length -
@@ -590,14 +622,14 @@ export function TextPrompt(): ReactElement {
       <div className="text-red-500" />
 
       <TextPromptContainer>
-        {textPromptUnFocused ? isFocused() : isFocused()}
+        {textPromptUnFocused && <TextBlurredScreen />}
         {previousTargetTextLineOne != null && (
           <React.Fragment>
             <PreviousChordRow scenario={currentTrainingScenario}>
               {(colorTargetLine(previousTargetTextLineOne) || [])?.map(
                 (chord, index) => (
                   <Chord
-                    key={r()}
+                    key={`prev-target-chord-${index}`}
                     error={
                       !(currentTrainingScenario != 'ALPHABET'
                         ? allTypedText[currentPos + index]?.slice(0, -1) ===
@@ -620,33 +652,32 @@ export function TextPrompt(): ReactElement {
           </React.Fragment>
         )}
         <ChordRow scenario={currentTrainingScenario}>
-          {(colorTargetLine(firstLineOfTargetText) || [])?.map(
-            (chord: any, i: any) => {
-              if (characterEntryMode === 'CHORD' || i !== indexOfTargetChord) {
-                return (
-                  <Chord
-                    key={r()}
-                    active={i === indexOfTargetChord}
-                    error={isError && i === indexOfTargetChord}
-                  >
-                    {chord}
-                  </Chord>
-                );
-              } else {
-                {
-                  ChordingEnabledAlgorithm(chord);
-                } //This call checks to see if the a chorded device was used
-                /* eslint-disable */
-                return (
-                  <CharacterEntryChord
-                    word={chord}
-                    index={targetCharacterIndex}
-                  />
-                );
-                /* eslint-disable */
-              }
-            },
-          )}
+          {(colorTargetLine(firstLineOfTargetText) || [])?.map((chord, i) => {
+            if (characterEntryMode === 'CHORD' || i !== indexOfTargetChord) {
+              return (
+                <Chord
+                  key={`chord-${i}`}
+                  active={i === indexOfTargetChord}
+                  error={isError && i === indexOfTargetChord}
+                >
+                  {chord}
+                </Chord>
+              );
+            } else {
+              {
+                ChordingEnabledAlgorithm(chord);
+              } //This call checks to see if the a chorded device was used
+              /* eslint-disable */
+              return (
+                <CharacterEntryChord
+                  key={`entry-${i}`}
+                  word={chord}
+                  index={targetCharacterIndex}
+                />
+              );
+              /* eslint-disable */
+            }
+          })}
         </ChordRow>
         <ChordRow scenario={currentTrainingScenario}>
           {letsFix(
@@ -657,8 +688,8 @@ export function TextPrompt(): ReactElement {
           )}
         </ChordRow>
         <ChordRow scenario={currentTrainingScenario}>
-          {(secondLineOfTargetText || [])?.map((chord) => (
-            <Chord key={r()}>{chord}</Chord>
+          {(secondLineOfTargetText || [])?.map((chord, i) => (
+            <Chord key={`chord-${currentLine}+1-${i}`}>{chord}</Chord>
           ))}
         </ChordRow>
 
@@ -666,8 +697,8 @@ export function TextPrompt(): ReactElement {
           <React.Fragment>
             <Spacer></Spacer>
             <ChordRow scenario={currentTrainingScenario}>
-              {(thirdLineOfTargetText || [])?.map((chord) => (
-                <Chord key={r()}>{chord}</Chord>
+              {(thirdLineOfTargetText || [])?.map((chord, i) => (
+                <Chord key={`chord-${currentLine}-1-${i}`}>{chord}</Chord>
               ))}
             </ChordRow>
           </React.Fragment>
@@ -685,11 +716,7 @@ export default function CharacterEntryChord({
   index: number | undefined;
 }): ReactElement {
   if (index === undefined || index === null)
-    return (
-      <span className="text-black whitespace-pre-wrap" key={Math.random()}>
-        {word}
-      </span>
-    );
+    return <span className="text-black whitespace-pre-wrap">{word}</span>;
 
   const wordSplit = word.split('');
 
@@ -697,16 +724,16 @@ export default function CharacterEntryChord({
     <div
       style={{ whiteSpace: 'pre-wrap', flexDirection: 'row', color: 'gray' }}
     >
-      {wordSplit.slice(0, index).map((char) => (
-        <span className="text-black whitespace-pre-wrap" key={Math.random()}>
+      {wordSplit.slice(0, index).map((char, i) => (
+        <span className="text-black whitespace-pre-wrap" key={`before-${i}`}>
           {char}
         </span>
       ))}
       <span className="text-white bg-black whitespace-pre-wrap">
         {wordSplit[index]}
       </span>
-      {wordSplit.slice(index + 1).map((char) => (
-        <span className="text-grey" key={Math.random()}>
+      {wordSplit.slice(index + 1).map((char, i) => (
+        <span className="text-grey" key={`after-${i}`}>
           {char}
         </span>
       ))}

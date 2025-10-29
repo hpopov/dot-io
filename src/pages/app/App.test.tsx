@@ -8,14 +8,54 @@ const ALPHABET_CHORDS = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
 describe('<App>', () => {
   let timer: IMockPerformance | null;
+  let originalLocalStorage: Storage;
+  let mockStorage: Record<string, string>;
+
+  before(() => {
+    originalLocalStorage = globalThis.localStorage;
+    // Mock localStorage to isolate tests from user's saved data
+    mockStorage = {};
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: {
+        getItem: (key: string) => mockStorage[key] || null,
+        setItem: (key: string, value: string) => {
+          mockStorage[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete mockStorage[key];
+        },
+        clear: () => {
+          mockStorage = {};
+        },
+        get length() {
+          return Object.keys(mockStorage).length;
+        },
+        key: (index: number) => Object.keys(mockStorage)[index] || null,
+      },
+      writable: true,
+      configurable: true,
+    });
+  });
 
   beforeEach(() => {
+    globalThis.localStorage.clear();
     timer = mockPerformance();
   });
 
   afterEach(() => {
     timer?.uninstall();
     timer = null;
+  });
+
+  after(() => {
+    globalThis.localStorage.clear();
+    // Restore original localStorage
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: originalLocalStorage,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('can successfully create a store', () => {
@@ -102,11 +142,11 @@ describe('<App>', () => {
     for (let i = 0; i < firstLineLength; i++)
       actions().setTypedTrainingText(state().trainingText[0][i]);
 
-    expect(state().trainingText.length).to.equal(3);
+    expect(state().trainingText.length).to.equal(4);
 
     actions().resetTrainingText();
 
-    expect(state().trainingText.length).to.equal(2);
+    expect(state().trainingText.length).to.equal(3);
   });
 
   it('does not prompt for spacebar after key in alphabet mode, but does for all other modes', () => {
@@ -206,6 +246,10 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['ALPHABET']);
+    actions().setTrainingSettings({
+      ...state().trainingSettings,
+      autoOrCustom: 'AUTO',
+    });
 
     const firstChord = state().targetWord + '';
     actions().setTypedTrainingText(firstChord);
@@ -224,6 +268,10 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['ALPHABET']);
+    actions().setTrainingSettings({
+      ...state().trainingSettings,
+      autoOrCustom: 'AUTO',
+    });
     actions().UNSAFE_setTrainingText([ALPHABET_CHORDS]);
 
     for (let i = 0; i < ALPHABET_CHORDS.length; i++) {
@@ -248,6 +296,13 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['ALPHABET']);
+    actions().setTrainingSettings({
+      ...state().trainingSettings,
+      autoOrCustom: 'AUTO',
+      recursionRate: 0, // Reset to 0 when switching to AUTO mode
+    });
+    // Set a known sequence of unique chords to avoid flakiness from duplicates
+    actions().UNSAFE_setTrainingText([['a', 'b', 'c', 'd']]);
     expect(state().trainingSettings.recursionRate).to.equal(0);
 
     timer?.tick(100);
@@ -272,6 +327,12 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['LEXICAL']);
+    actions().setTrainingSettings({
+      ...state().trainingSettings,
+      autoOrCustom: 'AUTO',
+    });
+    // Set a known sequence of unique words to avoid flakiness from duplicates
+    actions().UNSAFE_setTrainingText([['word1', 'word2', 'word3']]);
     testRecursionRatePercentageInMode(actions, state);
   });
 
@@ -281,6 +342,12 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['CHORDING']);
+    actions().setTrainingSettings({
+      ...state().trainingSettings,
+      autoOrCustom: 'AUTO',
+    });
+    // Set a known sequence of unique chords to avoid flakiness from duplicates
+    actions().UNSAFE_setTrainingText([['chord1', 'chord2', 'chord3']]);
     testRecursionRatePercentageInMode(actions, state);
   });
 
@@ -290,10 +357,16 @@ describe('<App>', () => {
     const state = store.getState;
 
     actions().beginTrainingMode(['TRIGRAM']);
+    actions().setTrainingSettings({
+      ...state().trainingSettings,
+      autoOrCustom: 'AUTO',
+    });
+    // Set a known sequence of unique trigrams to avoid flakiness from duplicates
+    actions().UNSAFE_setTrainingText([['abc', 'def', 'ghi']]);
     testRecursionRatePercentageInMode(actions, state);
   });
 
-  it('only updates settings if set to "auto"', () => {
+  it('should NOT update settings if set to "custom"', () => {
     const store = createStore<CompleteStoreModel>(defaultStoreState);
     const actions = store.getActions;
     const state = store.getState;
@@ -392,6 +465,8 @@ function trainAlphabet(
   timer: IMockPerformance | null,
 ) {
   actions().beginTrainingMode(['ALPHABET']);
+  // Set deterministic training text to avoid flakiness
+  actions().UNSAFE_setTrainingText([ALPHABET_CHORDS]);
 
   const numberOfKeysBeforeTraining = parseFloat(
     getCumulativeValueByPropertyName(

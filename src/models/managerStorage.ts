@@ -1,5 +1,5 @@
 import type { Action, Computed, Thunk } from 'easy-peasy';
-import type { Chords, ChordLayout } from './managerModels';
+import type { Chords, ChordLayout, ChordStructure } from './managerModels';
 
 export interface ManagerStoreState {
   downloadedChords: Chords;
@@ -42,21 +42,21 @@ export interface ManagerStoreState {
 }
 
 export interface ManagerStoreActions {
-  setDownloadedChords: Action<ManagerStore, Chords>;
-  setSingleDownloadedChord: Action<ManagerStore, Chords>;
+  setDownloadedChords: Action<ManagerStore, ChordStructure[]>;
+  setSingleDownloadedChord: Action<ManagerStore, ChordStructure>;
   deleteDownloadedChordsData: Action<ManagerStore, Chords>;
   saveDownloadedChordsData: Action<ManagerStore, Chords>;
   setDownloadedChordLayout: Action<ManagerStore, ChordLayout>;
   setImportedChords: Action<ManagerStore, Chords>;
   setImportedChordsLayout: Action<ManagerStore, Chords>;
-  deleteDownloadedChordsLayoutData: Action<ManagerStore, ChordLayout>;
-  saveDownloadedChordLayoutData: Action<ManagerStore, ChordLayout>;
+  // deleteDownloadedChordsLayoutData: Action<ManagerStore, ChordLayout>;
+  // saveDownloadedChordLayoutData: Action<ManagerStore, ChordLayout>;
   clearDownloadedChords: Action<ManagerStore, ChordLayout>;
   clearDownloadedChordLayout: Action<ManagerStore, ChordLayout>;
   setSerialApiResponses: Action<ManagerStore, string[]>;
   setSerialApiRequests: Action<ManagerStore, number>;
-  setCommitAllCounterForChords: Action<ManagerStore, number>;
-  setCommitAllCounterForChordLayout: Action<ManagerStore, number>;
+  // setCommitAllCounterForChords: Action<ManagerStore, number>;
+  // setCommitAllCounterForChordLayout: Action<ManagerStore, number>;
   updateSerialAPiDataThunk: Thunk<ManagerStore>;
   setDeviceId: Action<ManagerStore, any>;
 }
