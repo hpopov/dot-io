@@ -18,7 +18,7 @@
     /* noEmit - Vite builds (emits) files, not tsc. */
     "noEmit": true,
     /* Additional Options */
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "types": ["mocha", "vite/client", "chai", "node"],
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
