@@ -87,3 +87,8 @@ Vite will automatically open the local development version of the site in your p
 
 Anytime you update a file in your IDE or text editor, Vite will pick up on your change and update the site automatically, through a feature called "Hot Reload." However, Hot Reload can be finicky at times, so it can be worth doing a manual refresh of the browser if the site is not behaving like you expect.
 
+## Commands to run on worktrees
+```bash
+git config --global commit.gpgsign true
+git config --global tag.gpgSign true
+```
