@@ -5,7 +5,7 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  
+
   resolve: {
     alias: {
       // Add any path aliases you need
@@ -36,8 +36,4 @@ export default defineConfig({
     open: true,
   },
 
-  // Handle Node.js polyfills if needed
-  define: {
-    'process.env': {},
-  },
 });

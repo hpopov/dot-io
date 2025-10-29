@@ -1,5 +1,3 @@
-# No longer maintained
-
 # Introduction
 
 [Dot I/O](https://www.iq-eq.io/#/) is a free, open source, web based training tool designed to forever change the way we learn to type.
@@ -26,6 +24,14 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 
 To join our active discord please click here: https://discord.gg/rWBuHeR9yU. To get the Developer Role within the discord please ping '@iq-eq Rep'
 
+
+# Technical Stack
+
+This project builds & runs on:
+- Node 22 (compatible with NVM through [.nvmrc](.nvmrc))
+- Vite
+- React 18
+- React Testing Library
 
 # Dependency Installation
 
@@ -57,29 +63,27 @@ As long as there are no error messages present, you can assume the previous step
 
 # Running Locally
 
-To run the project locally on your development machine, navigate back to the root directory of the project, and run the `npm start` command. This will execute the `start` script located in the [package.json]file in your root directory. This will in turn execute `snowpack dev`, snowpack being the frontend build tool that bundles and serves your project.
+To run the project locally on your development machine, navigate back to the root directory of the project, and run the `npm start` command. This will execute the `start` script located in the [package.json](package.json) file in your root directory. This will in turn execute `vite`, vite being the frontend build tool that bundles and serves your project.
 
 If successful, you should see something similar to the following output:
 
 ```
-$ npm start
+❯ npm start
 
-> start
-> snowpack dev
+> dot-io@1.0.0 start
+> vite
 
-[11:42:12] [snowpack] Ready!
-[11:42:12] [snowpack] Server started in 60ms.
-[11:42:12] [snowpack] Local: http://localhost:8080
-[11:42:12] [snowpack] Network: http://192.168.1.155:8080
-[11:42:12] [@snowpack/plugin-typescript] 10:41:12 AM - Starting compilation in watch mode...
+11:54:17 PM [vite] (client) Re-optimizing dependencies because vite config has changed
 
-⠸ watching for file changes...
+  VITE v7.1.12  ready in 212 ms
+
+  ➜  Local:   http://localhost:8080/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+
 ```
 
-Snowpack will automatically open the local development version of the site in your preferred browser. However, if Dot I/O is not opened automatically, the site can also be found at the url posted in your terminal by snowpack, most likely http://localhost:8080.
+Vite will automatically open the local development version of the site in your preferred browser. However, if Dot I/O is not opened automatically, the site can also be found at the url posted in your terminal by Vite, most likely http://localhost:8080.
 
-Anytime you update a file in your IDE or text editor, snowpack will pick up on your change and update the site automatically, through a feature called "Hot Reload." However, Hot Reload can be finicky at times, so it can be worth doing a manual refresh of the browser if the site is not behaving like you expect.
+Anytime you update a file in your IDE or text editor, Vite will pick up on your change and update the site automatically, through a feature called "Hot Reload." However, Hot Reload can be finicky at times, so it can be worth doing a manual refresh of the browser if the site is not behaving like you expect.
 
-# Next Steps
-
-For more information, see the articles on architecture, testing, and deployment 
