@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - $default-branch
-      - feature/migrate-to-vite
 
 jobs:
   build-and-deploy:
